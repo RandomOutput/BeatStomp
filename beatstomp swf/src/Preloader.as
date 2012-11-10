@@ -7,12 +7,12 @@
   import flash.media.*;
   import flash.utils.getDefinitionByName;
    
-  [SWF(width = "640", height = "480", backgroundColor = "#000000")]
+  [SWF(width = "800", height = "800", backgroundColor = "#000000")]
   
   public class Preloader extends MovieClip
   {
     public static var screen:Bitmap =
-      new Bitmap(new BitmapData(640, 480, false, 0));
+      new Bitmap(new BitmapData(800, 800, false, 0));
       
     [Embed (source="preloader/twinbeard.png")]
       private static const Twinbeard:Class;
@@ -65,15 +65,18 @@
       if(logosound_channel) sound_pos = logosound_channel.position / 1000.0;
       else sound_pos += 1/30.0;
       
-      if(sound_pos < 1.5) drawFrame(1, 245+Math.random()*3, 50+Math.random()*3);
-      else if(sound_pos < 2.83) drawFrame(1, 245, 50);
-      else if(sound_pos < 3.66) drawFrame(2, 245, 50);
-      else if(sound_pos < 4.5 ) drawFrame(3, 245, 50);
-      else if(sound_pos < 5.33) drawFrame(4, 245, 50);
-      else if(sound_pos < 6.5 ) drawFrame(5, 245, 50);
-      else drawFrame(6, 245, 50);
+      if(logosound_channel) sound_pos = logosound_channel.position / 1000.0;
+      else sound_pos += 1/30.0;
+      var x:int = 325, y:int = 200;
+      if(sound_pos < 1.5) drawFrame(1, x+Math.random()*3, y+Math.random()*3);
+      else if(sound_pos < 2.83) drawFrame(1, x, y);
+      else if(sound_pos < 3.66) drawFrame(2, x, y);
+      else if(sound_pos < 4.5 ) drawFrame(3, x, y);
+      else if(sound_pos < 5.33) drawFrame(4, x, y);
+      else if(sound_pos < 6.5 ) drawFrame(5, x, y);
+      else drawFrame(6, x, y);
       
-      var text_x:int = 640, text_y:int = 455;
+      var text_x:int = 800, text_y:int = 775;
       if(loaded_percent == 100)
         Text.renderTo(screen, "[Click to continue]", text_x, text_y, 2,
                       Text.ALIGN_RIGHT);

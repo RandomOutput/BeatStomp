@@ -14,7 +14,7 @@ package state
     private var song_time:Number = 0;
     private var song_position:Number = 0;
     private var scale:int = 35;
-    private var tempo:int = 151;
+    private var tempo:Number = 151;
     private var hit_state:Number = 0.3;
     private var last_direction:int = -1;
     private var last_direction_time:int = 0;
@@ -115,11 +115,6 @@ package state
     
       latency = latency_;
       var time:Number = 0;
-      for(var i:int=0; i<song_data.length; i+=2)
-      {
-        time+=song_data[i];
-        song[time] = [song_data[i+1], false, false];
-      }
       
       if(MusicHandler.current_music) MusicHandler.current_music.stop(2);
       light_overlay.filters = [new BlurFilter(16, 16)];

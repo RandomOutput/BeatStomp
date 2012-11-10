@@ -6,7 +6,7 @@ package
   public class Display 
   {
     public static var   stage        :Stage = null;
-    public static const screen_size  :Vect2 = new Vect2(640, 480);
+    public static const screen_size  :Vect2 = new Vect2(800, 800);
     public static const screen_center:Vect2 = screen_size.divide(2);
     public static var screen:Image = Image.blank(screen_size.x, screen_size.y);
     public static var ui_screen:Image = 
