@@ -14,6 +14,9 @@ package
     [Embed (source="assets/debateroom.jpg")] private static const Debateroom:Class;
     public static const debateroom:Image = new Image(new Debateroom().bitmapData);
 
+    [Embed(source = "assets/arrows-hollow.png")] public static const ArrowsHollow:Class;
+    public static const arrowshollow:Spriteset = new Spriteset(new ArrowsHollow(), 32);
+      
     [Embed(source = "assets/arrows.png")] public static const Arrows:Class;
     public static const arrows:Spriteset = new Spriteset(new Arrows(), 32);
       

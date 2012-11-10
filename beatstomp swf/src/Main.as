@@ -34,7 +34,7 @@ package
       
       input = new Input();
       
-      pushState(new Title());
+      pushState(new Dance(50));
       
       stage.addEventListener(Event.ENTER_FRAME, frame);
     }
@@ -60,8 +60,8 @@ package
       
       fuses.tick();
       
-      //Text.renderTo(Display.screen, (getTimer()-time).toString(), 0,
-      //  Display.screen_size.y-22);      
+      Text.renderTo(Display.screen, (getTimer()-time).toString(), 0,
+        Display.screen_size.y-22);      
     }
     
     static public function clearStates():void

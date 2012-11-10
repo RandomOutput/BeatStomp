@@ -1,23 +1,29 @@
 package  
 {
   import flash.events.*;
+  import flash.utils.getTimer;
   
   public class Input 
   {
     private var keys:Array = new Array(256);
     private var mouse_position:Vect2 = new Vect2(0, 0);
-    public var mouse_down:Boolean = false;
+    private var mouse_down:Boolean = false;
     
     private var last_keys:Array = new Array(256);
     private var last_mouse_position:Vect2 = new Vect2(0, 0);
     private var last_mouse_down:Boolean = false;
+    private var random_seed:uint = Math.random()*int.MAX_VALUE;
     
-    static private var random_seed:uint = 31337;
-
     private var update_count:int = 0;
     private var playback_position:int = 0;
     
     private var recorded_input:Array = [];
+    
+    public function random():Number
+    {
+      random_seed = (random_seed * 16807) % 2147483647;
+      return (random_seed)/0x7FFFFFFF+0.000000000233;
+    }
     
     public function Input() 
     {
@@ -41,13 +47,17 @@ package
       //trace("recorded_input[recorded_input.length-1].reset = true;");
       
       //var output:String = "recorded_input.push({state: "+(update_count++)+", ";
+
     }
-     
+    
+    public static function time():Number
+    {
+      return getTimer()/1000.0;
+    }
+    
     public static function rand():Number
     {
-      return Math.random();
-      random_seed = (random_seed * 16807) % 2147483647;
-      return (random_seed)/0x7FFFFFFF+0.000000000233;
+      return Main.input.random();
     }
     
     public static function randInt(min:int, max:int):int
@@ -64,7 +74,7 @@ package
     {
       return array[int(rand()*array.length)];
     }
-    
+
     public function reset():void
     {
       for(var i:int=0; i<256; i++) keys[i] = false, last_keys[i] = false;

@@ -6,7 +6,7 @@ package
   public class Spriteset
   {
     public var frame_count:int;
-    private var transformed_sets:Object = {};
+    private var transformed_sets:Object = { n: 0 };
 
     public function Spriteset(source:Bitmap, frame_width:int)
     {
@@ -17,7 +17,7 @@ package
       transformed_sets[null_key] = [];
       
       // break up the sheet into individual sprites
-      for(var i:int = 0; i<=source.width; i+=frame_width)
+      for(var i:int = 0; i<source.width; i+=frame_width)
       {
         var b:Bitmap = new Bitmap(new BitmapData(width, height, true, 0));
         b.bitmapData.copyPixels(source.bitmapData,
@@ -56,7 +56,9 @@ package
         source.gotoAndStop(i);
         var matrix:Matrix = new Matrix(scale, 0, 0, scale, offset_x, offset_y);
         matrix.translate(i*size_x, 0);
+        Misc.pushQuality(StageQuality.BEST);
         bitmap.bitmapData.draw(source, matrix);
+        Misc.popQuality();
       }
       
       return new Spriteset(bitmap, size_x);
@@ -69,14 +71,18 @@ package
     }
     
     /* Render into the destination bitmap using BitmapData.copyPixels().
-       Build a transform set if one exists. */
+       Build a transform set if none exists. */
     public function blit(dest:Bitmap, x:int, y:int, frame:int=0,
        h_flip:Boolean=false, v_flip:Boolean=false, rotate:int=0,
-       color:ColorTransform=null):void
+       scale:Number=1, color:ColorTransform=null):void
     {
-      var key:Array = transformKey(h_flip, v_flip, rotate, color);
+      var key:Array = transformKey(h_flip, v_flip, rotate, scale, color);
       
-      if(!transformed_sets[key]) buildTransformSet(key);
+      if(!transformed_sets[key])
+      {
+        //trace(++transformed_sets.n);
+        buildTransformSet(key);
+      }
       
       var bitmap:BitmapData = transformed_sets[key][frame].bitmapData;
       dest.bitmapData.copyPixels(bitmap, bitmap.rect,
@@ -85,13 +91,12 @@ package
     
     /* Render into the destination using a one-off free-form transfrom;
        don't cache anything. */
-    public function draw(dest:Bitmap, x:int, y:int, frame:int=0,
+    public function draw(dest:Bitmap, x:Number, y:Number, frame:int=0,
       scale_x:Number=1, scale_y:Number=1, angle:Number=0,
-      color:ColorTransform=null):void
+      color:ColorTransform=null, smoothing:Boolean=false):void
     {
       // get the frame out of the non-transformed set
       var bitmap:BitmapData = transformed_sets[transformKey()][frame].bitmapData;
-      
       // build the transformation matrix with respect to the center of the image
       var m:Matrix = new Matrix();
       m.translate(-bitmap.width/2, -bitmap.height/2);
@@ -99,30 +104,33 @@ package
       m.rotate(angle);
       m.translate(x, y);
       
-      dest.bitmapData.draw(bitmap, m, color);
+      dest.bitmapData.draw(bitmap, m, color, null, null, smoothing);
     }
     
     private function transformKey(h_flip:Boolean=false, v_flip:Boolean=false,
-      rotate:int=0, color:ColorTransform=null):Array
+      rotate:int=0, scale:Number=1, color:ColorTransform=null):Array
     {
-      return [h_flip, v_flip, rotate%4, color];
+      return [h_flip, v_flip, rotate%4, color, scale];
     }
     
     private function buildTransformSet(key:Array):void
     {
       transformed_sets[key] = [];
       var bitmap:Bitmap = transformed_sets[transformKey()][0];
-      if(key[2]%2==0) var width:int=bitmap.width, height:int=bitmap.height;
+      if(key[2]%2==0) var width:Number=bitmap.width, height:Number=bitmap.height;
       else width=bitmap.height, height=bitmap.width;
+      
+      width *= key[4], height *= key[4];
       
       for(var i:int=0; i<frame_count; i++)
       {
         var new_sprite:Bitmap =
           new Bitmap(new BitmapData(width, height, true, 0));
-        draw(new_sprite, width/2, height/2, i, key[0]?-1:1, key[1]?-1:1,
-          key[2]*Math.PI/2, key[3]);
+        draw(new_sprite, width/2, height/2, i, key[0]?-key[4]:key[4],
+          key[1]?-key[4]:key[4], key[2]*Math.PI/2, key[3]);
         transformed_sets[key].push(new_sprite);
       }
+      //trace(key[0]?-key[4]:key[4], key[1]?-key[4]:key[4]);
     }
   }
 }

@@ -7,20 +7,58 @@ package
   public class Misc
   {
     public static const epsilon      :Number = 0.00001;
-    
-    public static function lineCircle(start:Vect2, end:Vect2, point:Vect2, radius:Number):Boolean
+    public static var   point_zero   :Point  = new Point(0, 0);
+
+    static public var recently_exhausted:Object = {};
+    static public function randOfExhausted(name:String, fraction:Number,
+      of:Array):Object
     {
-      var d:Vect2 = end.subtract(start);
-      var f:Vect2 = point.subtract(start);
-      var a:Number = d.dot(d)
-      var b:Number = 2*f.dot(d);
-      var c:Number = f.dot(f)*radius*radius;
-      var discriminant:Number = b*b-4*a*c;
-      if(discriminant<0) return false;
-      discriminant = Math.sqrt(discriminant);
-      var t1:Number = (-b + discriminant)/(2*a);
-      var t2:Number = (-b - discriminant)/(2*a);
-      return t1 >= 0 && t1 <= 1;
+      var recent:Array = recently_exhausted[name];
+      if(!recent) recent = [];
+      
+      var choice:Object;
+      do
+      {
+        choice = Input.randOf(of);
+        var exists:Boolean = false;
+        for each(var o:Object in recent) if(o == choice) exists = true;
+      } while(exists);
+      
+      recent.push(choice);
+      if(recent.length > of.length*fraction) recent.shift();
+      
+      recently_exhausted[name] = recent;
+      return choice;
+    }
+    
+    public static var quality_stack:Array = [];
+    
+    public static function pushQuality(s:String):void
+    {
+      quality_stack.push(Display.stage.quality);
+      Display.stage.quality = s;
+    }
+    
+    static public function popQuality():void
+    {
+      Display.stage.quality = quality_stack.pop();
+    }
+    
+    public static function commafy(n:int):String
+    {
+      var s:String = "";
+      var neg:Boolean = false;
+      if(n < 0) neg = true, n = -n;
+      
+      while(n >= 1000)
+      {
+        var chunk:String = String(n%1000);
+        while(chunk.length<3) chunk = "0"+chunk;
+        s = "," + chunk + s;
+        n /= 1000;
+      }
+      s = n+s;
+      return (neg?"-":"") + s;
     }
     
     public static function near(a:Number, b:Number):Boolean
@@ -35,17 +73,9 @@ package
       return 0;
     }
     
-    public static function transformFromColor(color:int):ColorTransform
+    public static function colorFromTransform(c:ColorTransform):int
     {
-      return new ColorTransform(
-        ((color >> 16) & 255) / 255.0,
-        ((color >>  8) & 255) / 255.0,
-        (color & 255) / 255.0); 
-    }
-    
-    public static function colorFromTransform(ct:ColorTransform):int
-    {
-      return colorFromTriplet([ct.redMultiplier, ct.greenMultiplier, ct.blueMultiplier]);
+      return colorFromTriplet([c.redMultiplier, c.greenMultiplier, c.blueMultiplier]);
     }
     
     public static function colorFromTriplet(a:Array):int
@@ -71,10 +101,22 @@ package
       return o;
     }
     
+    public static function bevelFill(bitmap:Bitmap):void
+    {
+      var rect:Rectangle = bitmap.bitmapData.rect;
+      bitmap.bitmapData.fillRect(rect, 0xff8f8f8f);
+      rect.top  += 2;
+      rect.left += 2;
+      bitmap.bitmapData.fillRect(rect, 0xff2f2f2f);
+      rect.bottom -= 2;
+      rect.right  -= 2;
+      bitmap.bitmapData.fillRect(rect, 0xff5f5f5f);
+    }
+    
     public static function offscreen(position:Vect2, radius:int=0):Boolean
     {
-      return position.x<-radius || position.x >= Display.screen.width +radius || 
-             position.y<-radius || position.y >= Display.screen.height+radius;
+      return position.x < -radius || position.x >= Display.screen_size.x+radius || 
+             position.y < -radius || position.y >= Display.screen_size.y+radius;
     }
   }
 }
