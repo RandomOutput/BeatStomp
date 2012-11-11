@@ -36,7 +36,6 @@ package entity
       
       if(alpha <= 0) remove = true;
       if(scale <= 0) remove = true;
-      if(position.y > 480) remove = true;
     }
     
     public override function draw():void

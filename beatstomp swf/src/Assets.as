@@ -20,6 +20,9 @@ package
     [Embed(source = "assets/arrows.png")] public static const Arrows:Class;
     public static const arrows:Spriteset = new Spriteset(new Arrows(), 32);
       
+    [Embed(source = "assets/shards.png")] public static const Shards:Class;
+    public static const shards:Spriteset = new Spriteset(new Shards(), 64);
+      
 
     [Embed(source = "assets/wif.mp3")] public static const Wif:Class;
     public static const wif:Sound = new Wif();
