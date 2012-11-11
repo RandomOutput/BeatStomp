@@ -24,6 +24,8 @@ package state
     private const note_distance_px:int = 350;
     private const note_distance_beats:int = 4;
     private const hit_leeway:Number = 0.3;
+	
+	private var data_manager:DataManager = null;
     
     public function Stomper(song_data:Array, sound:Sound, tempo:Number)
     {
@@ -36,6 +38,8 @@ package state
         time+=song_data[i];
         song_notes[time] = song_data[i+1];
       }
+	  
+	  data_manager = new DataManager();
     }
     
     override public function draw():void
@@ -43,6 +47,7 @@ package state
       super.draw();
       
       Text.renderTo(Display.screen, song_time_beats.toString(), 5, 5);
+	  trace("DataManager: " + data_manager.getPlayer1Rocking());
       var shape:Shape = new Shape();
       var b:Number = 1-(song_time_beats-Math.floor(song_time_beats))/2.0;
       shape.graphics.lineStyle(3, Misc.colorFromTriplet([b, b, b]));
