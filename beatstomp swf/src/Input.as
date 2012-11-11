@@ -1,6 +1,7 @@
 package  
 {
   import flash.events.*;
+  import flash.ui.*;
   import flash.utils.getTimer;
   
   public class Input 
@@ -18,6 +19,8 @@ package
     private var playback_position:int = 0;
     
     private var recorded_input:Array = [];
+    
+    private var data_manager:DataManager;
     
     public function random():Number
     {
@@ -148,8 +151,23 @@ package
       };
     }
     
+    public function stompState(states:Array):void
+    {
+      trace("Stomp state: " + states);
+      for(var i:int=0; i<4; i++)
+        keys[i] = states[i];
+    }
+
+    
+    public function connectDataManager():void
+    {
+      if(data_manager) data_manager.close();
+      data_manager = new DataManager(stompState);
+    }
+    
     protected function keyDown(e:KeyboardEvent):void
     {
+      if(e.keyCode == Keyboard.SPACE) connectDataManager();
       keys[e.keyCode] = true;
     }
     
@@ -175,6 +193,5 @@ package
       mouseMove(e);
       mouse_down = false;
     }
-
   }
 }

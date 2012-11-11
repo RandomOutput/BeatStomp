@@ -28,6 +28,11 @@ package{
       socketServer.connect(hostName, port);
     }
     
+    public function close():void
+    {
+      socketServer.close();
+    }
+    
     private function configure(disp:IEventDispatcher):void
     {
       trace("config");

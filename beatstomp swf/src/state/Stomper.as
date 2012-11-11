@@ -59,8 +59,6 @@ package state
         else
           song_notes[time] = song_data[i+1];
       }
-	  
-      data_manager = new DataManager(playerStateChanged);
     }
     
     override public function draw():void
@@ -142,6 +140,10 @@ package state
       {
         sound_channel = SoundChannelWrapper.play(song_sound);
         song_time_ms = 0;
+        sound_channel.whenComplete(function():void
+          {
+            Main.replaceTopState(new Menu());
+          })
       }
       
       song_time_ms += ms_per_frame;
@@ -183,7 +185,7 @@ package state
         ));
     }
     
-    private function directionFromKey(key:int):int
+    static public function directionFromKey(key:int):int
     {
       if(key < 4) return key;
       
@@ -204,17 +206,6 @@ package state
     }
 		
     private var old_states:Array = [ false, false, false, false ];
-    public function playerStateChanged(player_states:Array):void
-    {
-      trace("Player state changed: " + player_states);
-      for(var i:int=0; i<4; i++)
-        if(player_states[i]!=old_states[i])
-        {
-          if(player_states[i]) keyUp(i);
-          if(!player_states[i]) keyDown(i);
-          old_states[i] = player_states[i];
-        }
-    }
     
     private function keyDown(key:int):void
     {

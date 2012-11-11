@@ -11,18 +11,18 @@ movieclips = \
 }
 
 images = \
-{
-  "debateroom.jpg", "arrow-gradient"
-}
+[
+  "arrow"
+]
 
 spritesets = \
 {
-  "arrows": 32, "arrows-hollow": 32, "shards": 64
+  "shards": 64
 }
 
 sounds = \
 [
-  "wif"
+  "wif", "electro", "jump_around", "wwry"
 ]
 
 soundsets = \

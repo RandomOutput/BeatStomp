@@ -9,23 +9,21 @@ package
   { 
 
 
-    [Embed (source="assets/arrow-gradient.png")] private static const ArrowGradient:Class;
-    public static const arrowgradient:Image = new Image(new ArrowGradient().bitmapData);
-    [Embed (source="assets/debateroom.jpg")] private static const Debateroom:Class;
-    public static const debateroom:Image = new Image(new Debateroom().bitmapData);
+    [Embed (source="assets/arrow.png")] private static const Arrow:Class;
+    public static const arrow:Image = new Image(new Arrow().bitmapData);
 
-    [Embed(source = "assets/arrows-hollow.png")] public static const ArrowsHollow:Class;
-    public static const arrowshollow:Spriteset = new Spriteset(new ArrowsHollow(), 32);
-      
-    [Embed(source = "assets/arrows.png")] public static const Arrows:Class;
-    public static const arrows:Spriteset = new Spriteset(new Arrows(), 32);
-      
     [Embed(source = "assets/shards.png")] public static const Shards:Class;
     public static const shards:Spriteset = new Spriteset(new Shards(), 64);
       
 
     [Embed(source = "assets/wif.mp3")] public static const Wif:Class;
     public static const wif:Sound = new Wif();
+    [Embed(source = "assets/electro.mp3")] public static const Electro:Class;
+    public static const electro:Sound = new Electro();
+    [Embed(source = "assets/jump_around.mp3")] public static const Jump_Around:Class;
+    public static const jump_around:Sound = new Jump_Around();
+    [Embed(source = "assets/wwry.mp3")] public static const Wwry:Class;
+    public static const wwry:Sound = new Wwry();
 
 
   }

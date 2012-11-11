@@ -51,6 +51,9 @@ def readHeader(fi):
   ntracks = twoBytes2Int(fi.read(2))
   print '# tracks', ntracks
   nticks = twoBytes2Int(fi.read(2))
+  if nticks & 0x8000:
+    frames_per_sec = (nticks & 0x7fff)
+    
   print 'ticks per quarter', nticks
 
   return (ntracks, nticks)
@@ -78,7 +81,10 @@ def readTrack(fi):
     time += delta
 
     event = chunk.unpack("B", 1)[0]
-    if event == 0xff:
+
+    if event & 0xf0 == 0xd0:
+      pass #aftertouch
+    elif event == 0xff:
       subevent = chunk.unpack("B", 1)[0]
       length = chunk.readVariableLength()
       if subevent == 0x58:
