@@ -39,7 +39,7 @@ package state
         song_notes[time] = song_data[i+1];
       }
 	  
-	  data_manager = new DataManager();
+	  data_manager = new DataManager(playerStateChanged);
     }
     
     override public function draw():void
@@ -114,6 +114,10 @@ package state
       
       for each(var key:int in input.keys_down) keyDown(key);
     }
+		
+	public function playerStateChanged(player_states:Array) {
+		trace("Player state changed: " + player_states);
+	}
     
     private function keyDown(key:int):void
     {

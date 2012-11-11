@@ -15,10 +15,13 @@ package{
 		private var port:uint = 9002;
 		private var socketServer:XMLSocket;
 		
-		public var player_states:Array = null;
+		private var state_change_callback:Function = null;
+		
+		private var player_states:Array = null;
 	
-		public function DataManager()
+		public function DataManager(callback:Function)
 		{
+			state_change_callback = callback;
 			player_states = new Array(0, 0, 0, 0);
 			socketServer = new XMLSocket	;
 			configure(socketServer);
@@ -57,7 +60,7 @@ package{
 			for (var i:int = 0; i < 4; ++i) {
 				player_states[i] = ((incoming & (1 << i)) != 0);
 			}
-				  trace("DataManager: " + player_states);
+			state_change_callback(player_states);
 		}
 	}
 }
