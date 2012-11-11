@@ -163,7 +163,7 @@ package state
       for each(    key     in input.keys_up  ) keyUp  (key);
       
       for(var i:int=0; i<4; i++)
-        if(hang_times[i]>0) hang_times[i] = hang_times[i]*0.9 + 1*0.1;
+        if(hang_times[i]>0) hang_times[i] = hang_times[i]*0.95 + 1*0.05;
     }
     
     private function strikeAt(pos:Vect2):void
