@@ -28,7 +28,7 @@ package state
     private const center_circle_radius:int = 30;
     private const player_circle_radius:int = 15;
     private const note_radius:int = 15;
-    private const note_distance_px:int = 350;
+    private const note_distance_px:int = 475;
     private const note_distance_beats:int = 4;
     private const hang_time_growth:Number = 30;
     private const base_note_score:int = 250;
@@ -39,10 +39,10 @@ package state
 
     private const direction_vectors:Array =
     [
-      new Vect2(-1,  0),//.rotate(Math.PI/4),
-      new Vect2( 0,  1),//.rotate(Math.PI/4),
-      new Vect2( 0, -1),//.rotate(Math.PI/4),
-      new Vect2( 1,  0),//.rotate(Math.PI/4)
+      new Vect2(-1,  -1).normalize(),
+      new Vect2(-1,   1).normalize(),
+      new Vect2( 1,  -1).normalize(),
+      new Vect2( 1,   1).normalize()
     ];
     
     public function Stomper(song_data:Array, sound:Sound, tempo:Number)
@@ -75,24 +75,24 @@ package state
       shape.graphics.lineStyle(3, color);
       shape.graphics.drawCircle(Display.screen_center.x, Display.screen_center.y,
         center_circle_radius);
-      shape.graphics.drawCircle(Display.screen_center.x+note_distance_px,
-        Display.screen_center.y, player_circle_radius+hang_time_growth*hang_times[3]);
-      shape.graphics.drawCircle(Display.screen_center.x-note_distance_px,
-        Display.screen_center.y, player_circle_radius+hang_time_growth*hang_times[0]);
-      shape.graphics.drawCircle(Display.screen_center.x,
-        Display.screen_center.y+note_distance_px, player_circle_radius+hang_time_growth*hang_times[1]);
-      shape.graphics.drawCircle(Display.screen_center.x,
-        Display.screen_center.y-note_distance_px, player_circle_radius+hang_time_growth*hang_times[2]);
+        
+      for(var i:int=0; i<4; i++)
+      {
+        var circle_pos:Vect2 = direction_vectors[i].multiply(note_distance_px)
+          .add(Display.screen_center);
+        shape.graphics.drawCircle(circle_pos.x, circle_pos.y,
+          player_circle_radius+hang_time_growth*hang_times[i]);
+      }
 
       const direction_map:Array = [ 1, 0, 2, 3 ];
-      for(var i:int=0; i<4; i++)
+      for(i=0; i<4; i++)
       {
         var score_display:Bitmap = Text.render(int(scores[direction_map[i]]).toString()); 
         var matrix:Matrix = new Matrix();
         matrix.translate(-score_display.width/2, -score_display.height/2);
         matrix.rotate(Math.sin(song_time_beats*Math.PI/2)/5);
-        matrix.translate(100, 300+Math.sin(song_time_beats*Math.PI)*4);
-        matrix.rotate(i*Math.PI/2);
+        matrix.translate(75, 400+Math.sin(song_time_beats*Math.PI)*4);
+        matrix.rotate(i*Math.PI/2+Math.PI/4);
         matrix.translate(400, 400);
         Display.screen.bitmapData.draw(score_display, matrix);
       }
