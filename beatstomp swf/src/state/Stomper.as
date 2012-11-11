@@ -34,6 +34,8 @@ package state
     private const base_note_score:int = 250;
     private const hang_time_score_bonus:Number = 750;
     private const hit_leeway:Number = 0.3;
+	
+	private var data_manager:DataManager = null;
     
     private const direction_vectors:Array =
     [
@@ -57,6 +59,8 @@ package state
         else
           song_notes[time] = song_data[i+1];
       }
+	  
+	  data_manager = new DataManager(playerStateChanged);
     }
     
     override public function draw():void
@@ -196,6 +200,10 @@ package state
       
       hang_times[direction] = 0.01;
     }
+		
+	public function playerStateChanged(player_states:Array) {
+		trace("Player state changed: " + player_states);
+	}
     
     private function keyDown(key:int):void
     {
