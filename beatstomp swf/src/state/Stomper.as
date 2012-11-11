@@ -1,10 +1,14 @@
 package state 
 {
+  import flash.display.Bitmap;
   import flash.display.Shape;
+  import flash.geom.Matrix;
   import flash.media.Sound;
   import flash.ui.*;
+  import entity.*;
+  import mx.core.ILayoutDirectionElement;
   
-  public class Stomper extends State 
+  public class Stomper extends Playfield 
   {
     static public var latency_ms:Number = -16;
     static public var ms_per_frame:Number = 1000.0/60;
@@ -18,14 +22,28 @@ package state
     private var song_sound:Sound = null;
     private var song_tempo:Number = 0;
     
+    private var hang_times:Array = [ 0.0, 0.0, 0.0, 0.0 ];
+    private var scores:Array = [ 0, 0, 0, 0 ];
+    
     private const center_circle_radius:int = 30;
     private const player_circle_radius:int = 15;
     private const note_radius:int = 15;
     private const note_distance_px:int = 350;
     private const note_distance_beats:int = 4;
+    private const hang_time_growth:Number = 30;
+    private const base_note_score:int = 250;
+    private const hang_time_score_bonus:Number = 750;
     private const hit_leeway:Number = 0.3;
 	
 	private var data_manager:DataManager = null;
+    
+    private const direction_vectors:Array =
+    [
+      new Vect2(-1,  0),
+      new Vect2( 0,  1),
+      new Vect2( 0, -1),
+      new Vect2( 1,  0)
+    ];
     
     public function Stomper(song_data:Array, sound:Sound, tempo:Number)
     {
@@ -53,14 +71,27 @@ package state
       shape.graphics.drawCircle(Display.screen_center.x, Display.screen_center.y,
         center_circle_radius);
       shape.graphics.drawCircle(Display.screen_center.x+note_distance_px,
-        Display.screen_center.y, player_circle_radius);
+        Display.screen_center.y, player_circle_radius+hang_time_growth*hang_times[3]);
       shape.graphics.drawCircle(Display.screen_center.x-note_distance_px,
-        Display.screen_center.y, player_circle_radius);
+        Display.screen_center.y, player_circle_radius+hang_time_growth*hang_times[0]);
       shape.graphics.drawCircle(Display.screen_center.x,
-        Display.screen_center.y+note_distance_px, player_circle_radius);
+        Display.screen_center.y+note_distance_px, player_circle_radius+hang_time_growth*hang_times[1]);
       shape.graphics.drawCircle(Display.screen_center.x,
-        Display.screen_center.y-note_distance_px, player_circle_radius);
+        Display.screen_center.y-note_distance_px, player_circle_radius+hang_time_growth*hang_times[2]);
 
+      const direction_map:Array = [ 1, 0, 2, 3 ];
+      for(var i:int=0; i<4; i++)
+      {
+        var score_display:Bitmap = Text.render(int(scores[direction_map[i]]).toString()); 
+        var matrix:Matrix = new Matrix();
+        matrix.translate(-score_display.width/2, -score_display.height/2);
+        matrix.rotate(Math.sin(song_time_beats*Math.PI/2)/5);
+        matrix.translate(100, 300+Math.sin(song_time_beats*Math.PI)*4);
+        matrix.rotate(i*Math.PI/2);
+        matrix.translate(400, 400);
+        Display.screen.bitmapData.draw(score_display, matrix);
+      }
+      
       for(var p:String in song_notes)
       {
         var position:Number = Number(p);
@@ -68,14 +99,11 @@ package state
            position > song_time_beats+note_distance_beats)
           continue;
         
+        shape.graphics.beginFill(Misc.colorFromTriplet([b, b, b]), 1);
         for each(var note:int in song_notes[p])
         {
-          var direction:Vect2 = new Vect2(0, 0);
           if(note==-1) continue;
-          if(note==0) direction.x = -1;
-          if(note==1) direction.y =  1;
-          if(note==2) direction.y = -1;
-          if(note==3) direction.x =  1;
+          var direction:Vect2 = direction_vectors[note];
           
           var beat_position:Number = position - song_time_beats;
           var screen_position:Vect2 =
@@ -84,6 +112,7 @@ package state
           shape.graphics.drawCircle(screen_position.x, screen_position.y, 
             note_radius);
         }
+        shape.graphics.endFill();
       }
       
       Display.screen.bitmapData.draw(shape);
@@ -113,6 +142,45 @@ package state
       super.tick();
       
       for each(var key:int in input.keys_down) keyDown(key);
+      for each(    key     in input.keys_up  ) keyUp  (key);
+      
+      for(var i:int=0; i<4; i++)
+        if(hang_times[i]>0) hang_times[i] = hang_times[i]*0.9 + 1*0.1;
+    }
+    
+    private function strikeAt(pos:Vect2)
+    {
+      for(var i:int=0; i<Assets.shards.frame_count; i++)
+        addEntity(new Particle(
+          {
+            position: pos,
+            velocity: Misc.vectFromAngle(Input.randBetween(0, Math.PI*2)).multiply(Input.randBetween(1, 4)),
+            gravity: new Vect2(0, 0),
+            fade: -0.04,
+            offset: new Vect2(-24, -24),
+            scale: 0.75,
+            alpha: 1,
+            drawable: Assets.shards.frame(i)
+          }
+        ));
+    }
+    
+    private function directionFromKey(key:int):int
+    {
+      if(key == Keyboard.LEFT  || key==65)             return 0;
+      if(key == Keyboard.DOWN  || key==83 || key==79)  return 1;
+      if(key == Keyboard.UP    || key==87 || key==188) return 2;
+      if(key == Keyboard.RIGHT || key==68 || key==69)  return 3;
+      
+      return -1;
+    }
+    
+    private function keyUp(key:int):void
+    {
+      var direction:int = directionFromKey(key);
+      if(direction==-1) return;
+      
+      hang_times[direction] = 0.01;
     }
 		
 	public function playerStateChanged(player_states:Array) {
@@ -121,12 +189,8 @@ package state
     
     private function keyDown(key:int):void
     {
-      var direction:int = -1;
-      if(key == Keyboard.LEFT  || key==65)             direction = 0;
-      if(key == Keyboard.DOWN  || key==83 || key==79)  direction = 1;
-      if(key == Keyboard.UP    || key==87 || key==188) direction = 2;
-      if(key == Keyboard.RIGHT || key==68 || key==69)  direction = 3;
-      if(direction == -1) return;
+      var direction:int = directionFromKey(key);
+      if(direction==-1) return;
       
       for(var p:String in song_notes)
       {
@@ -134,9 +198,18 @@ package state
         for(var i:int=0; i<song_notes[p].length; i++)
         {
           trace(song_notes[p][i], direction);
-          if(song_notes[p][i] == direction) song_notes[p][i] = -1;
+          if(song_notes[p][i] == direction)
+          {
+            song_notes[p][i] = -1;
+            scores[direction] += base_note_score +
+              hang_time_score_bonus*hang_times[direction];
+            strikeAt(direction_vectors[direction].multiply(note_distance_px)
+              .add(Display.screen_center));
+          }
         }
       }
+      
+      hang_times[direction] = 0;      
     }
   }
 }

@@ -17,7 +17,7 @@ images = \
 
 spritesets = \
 {
-  "arrows": 32, "arrows-hollow": 32
+  "arrows": 32, "arrows-hollow": 32, "shards": 64
 }
 
 sounds = \
