@@ -15,10 +15,11 @@ package{
 		private var port:uint = 9002;
 		private var socketServer:XMLSocket;
 		
-		private var player1Rocking:Number = 0;
+		public var player_states:Array = null;
 	
 		public function DataManager()
 		{
+			player_states = new Array(0, 0, 0, 0);
 			socketServer = new XMLSocket	;
 			configure(socketServer);
 			socketServer.connect(hostName, port);
@@ -52,19 +53,11 @@ package{
 		{
 			//trace(getTimer());
 			socketServer.send("A");
-			//trace(event);
-			//trace(event.data);
-			//trace((int)(event.data));
 			var incoming:int = (int)(event.data);
-			player1Rocking = incoming / 1000.0;
-			//trace(player1Rocking);
-			//player1Rocking = parseInt(event);
+			for (var i:int = 0; i < 4; ++i) {
+				player_states[i] = ((incoming & (1 << i)) != 0);
+			}
+				  trace("DataManager: " + player_states);
 		}
-		
-		public function getPlayer1Rocking():Number
-		{
-			return player1Rocking;
-		}
-		
 	}
 }

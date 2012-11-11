@@ -47,7 +47,6 @@ package state
       super.draw();
       
       Text.renderTo(Display.screen, song_time_beats.toString(), 5, 5);
-	  trace("DataManager: " + data_manager.getPlayer1Rocking());
       var shape:Shape = new Shape();
       var b:Number = 1-(song_time_beats-Math.floor(song_time_beats))/2.0;
       shape.graphics.lineStyle(3, Misc.colorFromTriplet([b, b, b]));
