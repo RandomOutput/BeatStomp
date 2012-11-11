@@ -1,6 +1,19 @@
 import struct
 import sys
 
+def byte2int(byte):
+  return struct.unpack('B', byte)[0]
+
+def bytes2ints(bytes):
+  return [byte2int(b) for b in bytes]
+
+def twoBytes2Int(bb):
+  return 256*byte2int(bb[0]) + byte2int(bb[1])
+
+def fourBytes2Int(bb):
+  assert( len(bb) == 4 )
+  return struct.unpack('>I', bb)[0]
+
 class Chunk:
   def __init__(_, data):
     _.data = data
@@ -27,15 +40,30 @@ class Chunk:
     assert _.pos <= len(_.data)
 
 def readHeader(fi):
-  header = struct.unpack(">4sIHHH", fi.read(14))
-  assert header[:3] == ("MThd", 6, 1)
-  return header[3:] # track count, time resolution
+  header = fi.read(4)
+  print header
+  assert header == "MThd"
+  remainSize = bytes2ints(fi.read(4))
+  print remainSize
+  assert remainSize == [0,0,0,6]
+
+  print 'midi fmt', twoBytes2Int(fi.read(2))
+  ntracks = twoBytes2Int(fi.read(2))
+  print '# tracks', ntracks
+  nticks = twoBytes2Int(fi.read(2))
+  print 'ticks per quarter', nticks
+
+  return (ntracks, nticks)
   
 def readTrack(fi):
-  header = struct.unpack(">4sI", fi.read(8))
-  assert header[0] == "MTrk"
-  chunk = Chunk(fi.read(header[1]))
-  print "length ", header[1]
+  header = fi.read(4)
+  assert header == "MTrk"
+
+  # read 4 bytes of length
+  length = fourBytes2Int(fi.read(4))
+  print "length ", length
+  chunk = Chunk(fi.read(length))
+
   time = 0.0
   time_signature = (4, 4, 24, 8)
   clocks_per_beat = 24
@@ -100,7 +128,7 @@ def main():
 
   tracks, time_division = readHeader(fi)
   for track in xrange(tracks):
-    print "track: ", track
+    print "reading track", track
     readTrack(fi)
     
   fi.close()
