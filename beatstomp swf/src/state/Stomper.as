@@ -35,14 +35,14 @@ package state
     private const hang_time_score_bonus:Number = 750;
     private const hit_leeway:Number = 0.3;
 	
-	private var data_manager:DataManager = null;
-    
+    private var data_manager:DataManager = null;
+
     private const direction_vectors:Array =
     [
-      new Vect2(-1,  0),
-      new Vect2( 0,  1),
-      new Vect2( 0, -1),
-      new Vect2( 1,  0)
+      new Vect2(-1,  0),//.rotate(Math.PI/4),
+      new Vect2( 0,  1),//.rotate(Math.PI/4),
+      new Vect2( 0, -1),//.rotate(Math.PI/4),
+      new Vect2( 1,  0),//.rotate(Math.PI/4)
     ];
     
     public function Stomper(song_data:Array, sound:Sound, tempo:Number)
@@ -60,7 +60,7 @@ package state
           song_notes[time] = song_data[i+1];
       }
 	  
-	  data_manager = new DataManager(playerStateChanged);
+      data_manager = new DataManager(playerStateChanged);
     }
     
     override public function draw():void
@@ -117,12 +117,12 @@ package state
               shape.graphics.lineStyle(3, color);
             }
         }
-        for each(var note:int in song_notes[p])
+        for each(note in song_notes[p])
         {
           if(note==-1) continue;
           var direction:Vect2 = direction_vectors[note];
           
-          var beat_position:Number = position - song_time_beats;
+          beat_position = position - song_time_beats;
           var screen_position:Vect2 =
             Display.screen_center.add(direction.multiply(note_distance_px-
               beat_position*(note_distance_px/note_distance_beats)));
@@ -166,7 +166,7 @@ package state
         if(hang_times[i]>0) hang_times[i] = hang_times[i]*0.9 + 1*0.1;
     }
     
-    private function strikeAt(pos:Vect2)
+    private function strikeAt(pos:Vect2):void
     {
       for(var i:int=0; i<Assets.shards.frame_count; i++)
         addEntity(new Particle(
@@ -185,6 +185,8 @@ package state
     
     private function directionFromKey(key:int):int
     {
+      if(key < 4) return key;
+      
       if(key == Keyboard.LEFT  || key==65)             return 0;
       if(key == Keyboard.DOWN  || key==83 || key==79)  return 1;
       if(key == Keyboard.UP    || key==87 || key==188) return 2;
@@ -201,9 +203,18 @@ package state
       hang_times[direction] = 0.01;
     }
 		
-	public function playerStateChanged(player_states:Array) {
-		trace("Player state changed: " + player_states);
-	}
+    private var old_states:Array = [ false, false, false, false ];
+    public function playerStateChanged(player_states:Array):void
+    {
+      trace("Player state changed: " + player_states);
+      for(var i:int=0; i<4; i++)
+        if(player_states[i]!=old_states[i])
+        {
+          if(player_states[i]) keyUp(i);
+          if(!player_states[i]) keyDown(i);
+          old_states[i] = player_states[i];
+        }
+    }
     
     private function keyDown(key:int):void
     {
