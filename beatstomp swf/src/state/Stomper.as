@@ -52,7 +52,10 @@ package state
       for(var i:int=0; i<song_data.length; i+=2)
       {
         time+=song_data[i];
-        song_notes[time] = song_data[i+1];
+        if(song_data[i+1]==4)
+          song_notes[time] = [0, 1, 2, 3];
+        else
+          song_notes[time] = song_data[i+1];
       }
     }
     
@@ -60,10 +63,12 @@ package state
     {
       super.draw();
       
+      var b:Number = 1-(song_time_beats-Math.floor(song_time_beats))/2.0;
+      var color:int = Misc.colorFromTriplet([b, b, b]);
+      
       Text.renderTo(Display.screen, song_time_beats.toString(), 5, 5);
       var shape:Shape = new Shape();
-      var b:Number = 1-(song_time_beats-Math.floor(song_time_beats))/2.0;
-      shape.graphics.lineStyle(3, Misc.colorFromTriplet([b, b, b]));
+      shape.graphics.lineStyle(3, color);
       shape.graphics.drawCircle(Display.screen_center.x, Display.screen_center.y,
         center_circle_radius);
       shape.graphics.drawCircle(Display.screen_center.x+note_distance_px,
@@ -95,7 +100,19 @@ package state
            position > song_time_beats+note_distance_beats)
           continue;
         
-        shape.graphics.beginFill(Misc.colorFromTriplet([b, b, b]), 1);
+        if(song_notes[p].length == 4)
+        {
+          var a:Array = song_notes[p];
+          if(a[0]==0 || a[1]==1 || a[2]==2 || a[3]==3)
+            for each(var note:int in song_notes[p])
+            {
+              shape.graphics.lineStyle(16, color);
+              var beat_position:Number = position - song_time_beats;
+              shape.graphics.drawCircle(Display.screen_center.x, Display.screen_center.y,
+                note_distance_px-beat_position*(note_distance_px/note_distance_beats));
+              shape.graphics.lineStyle(3, color);
+            }
+        }
         for each(var note:int in song_notes[p])
         {
           if(note==-1) continue;
@@ -105,10 +122,11 @@ package state
           var screen_position:Vect2 =
             Display.screen_center.add(direction.multiply(note_distance_px-
               beat_position*(note_distance_px/note_distance_beats)));
+          shape.graphics.beginFill(Misc.colorFromTriplet([b, b, b]), 1);
           shape.graphics.drawCircle(screen_position.x, screen_position.y, 
             note_radius);
+          shape.graphics.endFill();
         }
-        shape.graphics.endFill();
       }
       
       Display.screen.bitmapData.draw(shape);
