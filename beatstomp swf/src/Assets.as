@@ -27,6 +27,8 @@ package
     public static const wwry:Sound = new Wwry();
     [Embed(source = "assets/bass_jump.mp3")] public static const Bass_Jump:Class;
     public static const bass_jump:Sound = new Bass_Jump();
+    [Embed(source = "assets/tmd.mp3")] public static const Tmd:Class;
+    public static const tmd:Sound = new Tmd();
 
 
   }

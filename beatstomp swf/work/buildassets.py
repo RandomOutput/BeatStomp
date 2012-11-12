@@ -22,7 +22,7 @@ spritesets = \
 
 sounds = \
 [
-  "wif", "electro", "jump_around", "wwry", "bass_jump"
+  "wif", "electro", "jump_around", "wwry", "bass_jump", "tmd"
 ]
 
 soundsets = \
