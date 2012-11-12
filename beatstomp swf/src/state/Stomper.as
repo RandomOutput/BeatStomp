@@ -88,7 +88,7 @@ package state
         var matrix:Matrix = new Matrix();
         matrix.translate(-score_display.width/2, -score_display.height/2);
         matrix.rotate(Math.sin(song_time_beats*Math.PI/2)/5);
-        matrix.translate(75, 400+Math.sin(song_time_beats*Math.PI)*4);
+        matrix.translate(75, 300+Math.sin(song_time_beats*Math.PI)*4);
         matrix.rotate(i*Math.PI/2+Math.PI/4);
         matrix.translate(400, 400);
         Display.screen.bitmapData.draw(score_display, matrix);
