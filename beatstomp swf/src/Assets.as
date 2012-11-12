@@ -9,11 +9,12 @@ package
   { 
 
 
-    [Embed (source="assets/arrow.png")] private static const Arrow:Class;
-    public static const arrow:Image = new Image(new Arrow().bitmapData);
 
     [Embed(source = "assets/shards.png")] public static const Shards:Class;
     public static const shards:Spriteset = new Spriteset(new Shards(), 64);
+      
+    [Embed(source = "assets/arrow.png")] public static const Arrow:Class;
+    public static const arrow:Spriteset = new Spriteset(new Arrow(), 64);
       
 
     [Embed(source = "assets/wif.mp3")] public static const Wif:Class;

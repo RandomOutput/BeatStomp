@@ -12,12 +12,12 @@ movieclips = \
 
 images = \
 [
-  "arrow"
 ]
 
 spritesets = \
 {
-  "shards": 64
+  "shards": 64,
+  "arrow": 64
 }
 
 sounds = \

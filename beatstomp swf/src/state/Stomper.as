@@ -16,7 +16,6 @@ package state
     private var song_time_ms:Number = -1;
     private var song_time_beats:Number = 0;
     private var last_reported_position_ms:Number = -1;
-    private var sound_channel:SoundChannelWrapper = null;
     
     private var song_notes:Object = {};
     private var song_sound:Sound = null;
@@ -28,16 +27,16 @@ package state
     private const center_circle_radius:int = 30;
     private const player_circle_radius:int = 15;
     private const note_radius:int = 15;
-    private const note_distance_px:int = 475;
+    public static const note_distance_px:int = 425;
     private const note_distance_beats:int = 4;
-    private const hang_time_growth:Number = 30;
+    private const hang_time_growth:Number = 60;
     private const base_note_score:int = 250;
     private const hang_time_score_bonus:Number = 750;
     private const hit_leeway:Number = 0.3;
 	
     private var data_manager:DataManager = null;
 
-    private const direction_vectors:Array =
+    public static const direction_vectors:Array =
     [
       new Vect2(-1,  -1).normalize(),
       new Vect2(-1,   1).normalize(),
@@ -138,9 +137,9 @@ package state
     {
       if(song_time_ms == -1)
       {
-        sound_channel = SoundChannelWrapper.play(song_sound);
+        MusicHandler.play(song_sound);
         song_time_ms = 0;
-        sound_channel.whenComplete(function():void
+        MusicHandler.current_music.channel.whenComplete(function():void
           {
             Main.replaceTopState(new Menu());
           })
@@ -148,7 +147,8 @@ package state
       
       song_time_ms += ms_per_frame;
       
-      var reported_position_ms:Number = sound_channel.getPosition();
+      var reported_position_ms:Number =
+        MusicHandler.current_music.channel.getPosition();
       if(reported_position_ms != last_reported_position_ms && 
          Math.abs(reported_position_ms - song_time_ms) > 50.0)
       {
